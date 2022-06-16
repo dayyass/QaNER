@@ -1,0 +1,11 @@
+*.DS_Store
+.python-version
+*.ipynb
+*.ipynb_checkpoints
+
+*__pycache__
+*.mypy_cache
+*.cache
+
+venv
+.idea
