@@ -1,1 +1,2 @@
+jupyter==1.0.0  # dev
 pre-commit==2.19.0  # dev
