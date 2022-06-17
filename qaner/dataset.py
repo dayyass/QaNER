@@ -35,7 +35,10 @@ class Dataset(torch.utils.data.Dataset):
 
         dataset = []
 
-        for sentence, labels in tqdm(zip(qa_sentences, qa_labels)):
+        for sentence, labels in tqdm(
+            zip(qa_sentences, qa_labels),
+            desc="prepare_dataset",
+        ):
             # TODO: remove hardcode
             for label_tag, label_name in [
                 ("LOC", "location"),

@@ -1,4 +1,7 @@
 import unittest
+from typing import List
+
+from tqdm import tqdm
 
 from qaner.data_utils import prepare_sentences_and_spans, read_conll_data_format
 from qaner.dataset import Dataset, Instance, Span
@@ -94,3 +97,37 @@ class TestDataset(unittest.TestCase):
 
         instance_pred = dataset[24]
         self.assertTupleEqual(instance_true, instance_pred)
+
+    def test_length(self):
+        self.assertEqual(len(token_seq), len(label_seq))
+        self.assertEqual(len(token_seq), 14986)
+
+        self.assertEqual(len(qa_sentences), len(qa_labels))
+        self.assertEqual(len(qa_sentences), 14986)
+
+        self.assertEqual(len(dataset), 66658)
+
+    def test_spans(self):
+        self.assertTrue(
+            validate_spans(
+                qa_sentences=qa_sentences,
+                qa_labels=qa_labels,
+            ),
+        )
+
+
+def validate_spans(
+    qa_sentences: List[str],
+    qa_labels: List[List[Span]],
+) -> bool:
+
+    for sentence, labels in tqdm(
+        zip(qa_sentences, qa_labels),
+        desc="validate_spans",
+    ):
+        for span in labels:
+            token = span.token
+            start_pos = span.start_pos
+            end_pos = span.end_pos
+            assert token == sentence[start_pos:end_pos]
+    return True
