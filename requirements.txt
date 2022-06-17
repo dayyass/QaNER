@@ -1,2 +1,5 @@
-jupyter==1.0.0  # dev
+jupyter==1.0.0      # dev
 pre-commit==2.19.0  # dev
+torch==1.11.0
+tqdm==4.64.0        # dev
+transformers==4.20.0
