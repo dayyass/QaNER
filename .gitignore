@@ -7,5 +7,8 @@
 *.mypy_cache
 *.cache
 
+*.coverage
+*coverage.xml
+
 venv
 .idea

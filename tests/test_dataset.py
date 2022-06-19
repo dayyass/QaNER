@@ -1,10 +1,13 @@
+import sys
 import unittest
 from typing import List
 
 from tqdm import tqdm
 
-from qaner.data_utils import prepare_sentences_and_spans, read_conll_data_format
-from qaner.dataset import Dataset, Instance, Span
+sys.path.append("qaner")  # TODO: fix it
+
+from data_utils import prepare_sentences_and_spans, read_conll_data_format  # noqa: E402
+from dataset import Dataset, Instance, Span  # noqa: E402
 
 token_seq, label_seq = read_conll_data_format(
     path="data/conll2003/train.txt",

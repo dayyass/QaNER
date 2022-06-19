@@ -4,6 +4,7 @@ from typing import List, Tuple
 from tqdm import tqdm, trange
 
 Span = namedtuple("Span", ["token", "label", "start_pos", "end_pos"])
+Instance = namedtuple("Instance", ["context", "question", "answer"])
 
 
 def read_conll_data_format(
