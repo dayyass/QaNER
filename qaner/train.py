@@ -1,6 +1,8 @@
 import torch
 from data_utils import prepare_sentences_and_spans, read_conll_data_format
 from dataset import Collator, Dataset
+from torch.utils.tensorboard import SummaryWriter
+from train_utils import train
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 from utils import set_global_seed
 
@@ -11,14 +13,14 @@ if __name__ == "__main__":
     # from arg_parse import get_train_args
     # args = get_train_args()
 
-    # reproducibility
     set_global_seed(42)  # TODO: remove hardcode
+    writer = SummaryWriter(log_dir="runs/qaner")  # TODO: remove hardcode
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # bert model
     model_name = "bert-base-uncased"  # TODO: remove hardcode
-
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+    model = AutoModelForQuestionAnswering.from_pretrained(model_name).to(device)
 
     # TODO: validate it
     tokenizer_kwargs = {
@@ -26,26 +28,47 @@ if __name__ == "__main__":
         "truncation": "only_second",
         "padding": True,
         "return_tensors": "pt",
-        # "return_offsets_mapping": True,
+        "return_offsets_mapping": True,
     }
 
-    # dataset and dataloader
+    # dataset and dataloader (train)
+    # TODO: add more general read_data function
+    # TODO: add valid data
     # TODO: remove hardcode
-    token_seq, label_seq = read_conll_data_format(
+    train_token_seq, train_label_seq = read_conll_data_format(
         path="data/conll2003/train.txt",
         sep=" ",
         lower=False,
         verbose=True,
     )
 
-    qa_sentences, qa_labels = prepare_sentences_and_spans(
-        token_seq=token_seq,
-        label_seq=label_seq,
+    train_qa_sentences, train_qa_labels = prepare_sentences_and_spans(
+        token_seq=train_token_seq,
+        label_seq=train_label_seq,
     )
 
-    dataset = Dataset(
-        qa_sentences=qa_sentences,
-        qa_labels=qa_labels,
+    train_dataset = Dataset(
+        qa_sentences=train_qa_sentences,
+        qa_labels=train_qa_labels,
+    )
+
+    # dataset and dataloader (test)
+    # TODO: remove hardcode
+    test_token_seq, test_label_seq = read_conll_data_format(
+        path="data/conll2003/test.txt",
+        sep=" ",
+        lower=False,
+        verbose=True,
+    )
+
+    test_qa_sentences, test_qa_labels = prepare_sentences_and_spans(
+        token_seq=test_token_seq,
+        label_seq=test_label_seq,
+    )
+
+    test_dataset = Dataset(
+        qa_sentences=test_qa_sentences,
+        qa_labels=test_qa_labels,
     )
 
     collator = Collator(
@@ -53,15 +76,34 @@ if __name__ == "__main__":
         tokenizer_kwargs=tokenizer_kwargs,
     )
 
-    # TODO: remove hardcode
-    dataloader = torch.utils.data.DataLoader(
-        dataset=dataset,
-        batch_size=2,
+    train_dataloader = torch.utils.data.DataLoader(
+        dataset=train_dataset,
+        batch_size=128,  # TODO: remove hardcode
         shuffle=True,
         collate_fn=collator,
     )
 
-    inputs = next(iter(dataloader))
-    outputs = model(**inputs)
+    test_dataloader = torch.utils.data.DataLoader(
+        dataset=test_dataset,
+        batch_size=128,  # TODO: remove hardcode
+        shuffle=False,
+        collate_fn=collator,
+    )
 
-    print(outputs.loss)
+    # train / eval
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=1e-5,  # TODO: remove hardcode
+    )
+
+    train(
+        n_epochs=2,  # TODO: remove hardcode
+        model=model,
+        train_dataloader=train_dataloader,
+        test_dataloader=test_dataloader,
+        optimizer=optimizer,
+        writer=writer,
+        device=device,
+    )
+
+    torch.save(model.cpu().state_dict(), "qaner.pth")  # TODO: remove hardcode

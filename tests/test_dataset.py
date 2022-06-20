@@ -40,7 +40,6 @@ tokenizer_kwargs = {  # TODO: validate it
     "truncation": "only_second",
     "padding": True,
     "return_tensors": "pt",
-    # "return_offsets_mapping": True,
 }
 
 
@@ -69,7 +68,7 @@ collator = Collator(
 dataloader = torch.utils.data.DataLoader(
     dataset=dataset,
     batch_size=2,
-    shuffle=True,
+    shuffle=False,
     collate_fn=collator,
 )
 
@@ -179,13 +178,16 @@ class TestCollator(unittest.TestCase):
                     3295,
                     1029,
                     102,
-                    2034,
-                    2484,
-                    3134,
-                    2727,
+                    7327,
+                    19164,
+                    2446,
+                    2655,
+                    2000,
+                    17757,
+                    2329,
+                    12559,
+                    1012,
                     102,
-                    0,
-                    0,
                 ],
                 [
                     101,
@@ -195,26 +197,29 @@ class TestCollator(unittest.TestCase):
                     2711,
                     1029,
                     102,
-                    2414,
-                    2727,
-                    1011,
-                    5511,
-                    1011,
-                    2423,
+                    7327,
+                    19164,
+                    2446,
+                    2655,
+                    2000,
+                    17757,
+                    2329,
+                    12559,
+                    1012,
                     102,
                 ],
             ]
         )
         batch_true["token_type_ids"] = torch.tensor(
             [
-                [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             ]
         )
         batch_true["attention_mask"] = torch.tensor(
             [
-                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             ]
         )
         batch_true["start_positions"] = torch.tensor([0, 0])

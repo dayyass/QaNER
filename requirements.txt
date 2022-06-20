@@ -1,7 +1,7 @@
-coverage==6.4.1      # dev
-jupyter==1.0.0       # dev
-numpy==1.22.4
-pre-commit==2.19.0   # dev
-torch==1.11.0
-tqdm==4.64.0         # dev
-transformers==4.20.0
+coverage==6.4.1     # dev
+numpy==1.21.6
+pre-commit==2.19.0  # dev
+tensorboard==2.9.0
+torch==1.8.1
+tqdm==4.64.0
+transformers==4.19.2

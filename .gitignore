@@ -12,3 +12,6 @@
 
 venv
 .idea
+
+runs
+*.pth
