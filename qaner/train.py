@@ -91,6 +91,7 @@ if __name__ == "__main__":
     )
 
     # train / eval
+    # TODO: change to AdamW
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=1e-5,  # TODO: remove hardcode

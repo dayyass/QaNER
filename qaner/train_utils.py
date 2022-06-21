@@ -112,7 +112,7 @@ def train_epoch(
             offset_mapping_batch=offset_mapping_batch,
             instances_batch=instances_batch,
             n_best_size=1,
-            max_answer_length=100,
+            max_answer_length=100,  # TODO: remove hardcode
         )
 
         # TODO: maybe move into get_top_valid_spans
@@ -146,9 +146,12 @@ def train_epoch(
     writer.add_scalar("loss / train", avg_loss, epoch)
 
     for metric_name, metric_value_list in batch_metrics_list.items():
-        writer.add_scalar(f"{metric_name} / train", np.mean(metric_value_list), epoch)
+        metric_value = np.mean(metric_value_list)
+        print(f"Train {metric_name}: {metric_value}\n")
+        writer.add_scalar(f"{metric_name} / train", metric_value, epoch)
 
 
+# TODO: remove train_epoch code duplicates
 def evaluate_epoch(
     model: AutoModelForQuestionAnswering,
     dataloader: torch.utils.data.DataLoader,
@@ -170,6 +173,7 @@ def evaluate_epoch(
     model.eval()
 
     epoch_loss = []
+    batch_metrics_list = defaultdict(list)
 
     with torch.no_grad():
 
@@ -179,10 +183,10 @@ def evaluate_epoch(
             desc="loop over test batches",
         ):
 
-            # instances_batch = inputs.pop("instances")
+            instances_batch = inputs.pop("instances")
 
             inputs = inputs.to(device)
-            # offset_mapping_batch = inputs.pop("offset_mapping")
+            offset_mapping_batch = inputs.pop("offset_mapping")
 
             outputs = model(**inputs)
             loss = outputs.loss
@@ -192,6 +196,47 @@ def evaluate_epoch(
                 "batch loss / test", loss.item(), epoch * len(dataloader) + i
             )
 
+            spans_pred_batch_top_1 = get_top_valid_spans(
+                inputs=inputs,
+                outputs=outputs,
+                offset_mapping_batch=offset_mapping_batch,
+                instances_batch=instances_batch,
+                n_best_size=1,  # TODO: remove hardcode
+                max_answer_length=100,  # TODO: remove hardcode
+            )
+
+            # TODO: maybe move into get_top_valid_spans
+            for i in range(len(spans_pred_batch_top_1)):
+                if not spans_pred_batch_top_1[i]:
+                    empty_span = Span(
+                        token="",
+                        label="O",
+                        start_context_char_pos=0,
+                        end_context_char_pos=0,
+                    )
+                    spans_pred_batch_top_1[i] = [empty_span]
+
+            # TODO: change metrics calculation for inference time
+            spans_true_batch = [instance.answer for instance in instances_batch]
+
+            batch_metrics = compute_metrics(
+                spans_true_batch=spans_true_batch,
+                spans_pred_batch_top_1=spans_pred_batch_top_1,
+            )
+
+            for metric_name, metric_value in batch_metrics.items():
+                batch_metrics_list[metric_name].append(metric_value)
+                writer.add_scalar(
+                    f"batch {metric_name} / test",
+                    metric_value,
+                    epoch * len(dataloader) + i,
+                )
+
         avg_loss = np.mean(epoch_loss)
         print(f"Test loss:  {avg_loss}\n")
         writer.add_scalar("loss / test", avg_loss, epoch)
+
+        for metric_name, metric_value_list in batch_metrics_list.items():
+            metric_value = np.mean(metric_value_list)
+            print(f"Test {metric_name}: {metric_value}\n")
+            writer.add_scalar(f"{metric_name} / test", np.mean(metric_value), epoch)
