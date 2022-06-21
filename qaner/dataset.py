@@ -104,4 +104,7 @@ class Collator:
         tokenized_batch["start_positions"] = torch.LongTensor(start_pos_list)
         tokenized_batch["end_positions"] = torch.LongTensor(end_pos_list)
 
+        # additional
+        tokenized_batch["instances"] = batch
+
         return tokenized_batch

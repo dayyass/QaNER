@@ -99,6 +99,7 @@ if __name__ == "__main__":
     train(
         n_epochs=2,  # TODO: remove hardcode
         model=model,
+        tokenizer=tokenizer,
         train_dataloader=train_dataloader,
         test_dataloader=test_dataloader,
         optimizer=optimizer,
@@ -106,4 +107,6 @@ if __name__ == "__main__":
         device=device,
     )
 
-    torch.save(model.cpu().state_dict(), "qaner.pth")  # TODO: remove hardcode
+    # TODO: remove hardcode
+    model.save_pretrained("dayyass/qaner-conll-bert-base-uncased")
+    tokenizer.save_pretrained("dayyass/qaner-conll-bert-base-uncased")

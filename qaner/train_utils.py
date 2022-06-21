@@ -1,14 +1,16 @@
 import numpy as np
 import torch
+from inference_utils import get_top_valid_spans
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from transformers import AutoModelForQuestionAnswering
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 
 
 # TODO: add metrics calculation
 def train(
     n_epochs: int,
     model: AutoModelForQuestionAnswering,
+    tokenizer: AutoTokenizer,
     train_dataloader: torch.utils.data.DataLoader,
     test_dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
@@ -21,6 +23,7 @@ def train(
     Args:
         n_epochs (int): number of epochs to train.
         model (AutoModelForQuestionAnswering): model.
+        tokenizer (AutoTokenizer): tokenizer.
         train_dataloader (torch.utils.data.DataLoader): train_dataloader.
         test_dataloader (torch.utils.data.DataLoader): test_dataloader.
         optimizer (torch.optim.Optimizer): optimizer.
@@ -34,6 +37,7 @@ def train(
 
         train_epoch(
             model=model,
+            tokenizer=tokenizer,
             dataloader=train_dataloader,
             optimizer=optimizer,
             writer=writer,
@@ -42,6 +46,7 @@ def train(
         )
         evaluate_epoch(
             model=model,
+            tokenizer=tokenizer,
             dataloader=test_dataloader,
             writer=writer,
             device=device,
@@ -51,6 +56,7 @@ def train(
 
 def train_epoch(
     model: AutoModelForQuestionAnswering,
+    tokenizer: AutoTokenizer,
     dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
     writer: SummaryWriter,
@@ -62,6 +68,7 @@ def train_epoch(
 
     Args:
         model (AutoModelForQuestionAnswering): QA model.
+        tokenizer (AutoTokenizer): tokenizer.
         dataloader (torch.utils.data.DataLoader): dataloader.
         optimizer (torch.optim.Optimizer): optimizer.
         writer (SummaryWriter): tensorboard writer.
@@ -80,8 +87,10 @@ def train_epoch(
     ):
         optimizer.zero_grad()
 
+        instances_batch = inputs.pop("instances")
+
         inputs = inputs.to(device)
-        # offset_mapping_batch = inputs.pop("offset_mapping")  # TODO
+        offset_mapping_batch = inputs.pop("offset_mapping")
 
         outputs = model(**inputs)
         loss = outputs.loss
@@ -93,6 +102,19 @@ def train_epoch(
             "batch loss / train", loss.item(), epoch * len(dataloader) + i
         )
 
+        with torch.no_grad():
+            model.eval()
+            outputs_inference = model(**inputs)
+            top_1_spans_batch = get_top_valid_spans(  # noqa: F841
+                tokenizer=tokenizer,
+                inputs=inputs,
+                outputs=outputs_inference,
+                offset_mapping_batch=offset_mapping_batch,
+                instances_batch=instances_batch,
+                n_best_size=1,
+                max_answer_length=100,
+            )
+
     avg_loss = np.mean(epoch_loss)
     print(f"Train loss: {avg_loss}\n")
     writer.add_scalar("loss / train", avg_loss, epoch)
@@ -100,6 +122,7 @@ def train_epoch(
 
 def evaluate_epoch(
     model: AutoModelForQuestionAnswering,
+    tokenizer: AutoTokenizer,
     dataloader: torch.utils.data.DataLoader,
     writer: SummaryWriter,
     device: torch.device,
@@ -110,6 +133,7 @@ def evaluate_epoch(
 
     Args:
         model (AutoModelForQuestionAnswering): model.
+        tokenizer (AutoTokenizer): tokenizer.
         dataloader (torch.utils.data.DataLoader): dataloader.
         writer (SummaryWriter): tensorboard writer.
         device (torch.device): cpu or cuda.

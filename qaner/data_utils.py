@@ -112,7 +112,7 @@ def prepare_sentences_and_spans(
                 qa_lab_v2.append(span_v2)
             elif span.label.startswith("I-"):
                 # TODO: remove duplicates and optimize
-                span_v2 = Span(
+                span_v2 = Span(  # TODO: maybe use Span as dataclass
                     token=f"{span_v2.token} {span.token}",
                     label=span_v2.label,
                     start_pos=span_v2.start_pos,
