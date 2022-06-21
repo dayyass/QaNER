@@ -1,16 +1,19 @@
+from collections import defaultdict
+
 import numpy as np
 import torch
+from data_utils import Span
 from inference_utils import get_top_valid_spans
+from metrics import compute_metrics
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from transformers import AutoModelForQuestionAnswering
 
 
 # TODO: add metrics calculation
 def train(
     n_epochs: int,
     model: AutoModelForQuestionAnswering,
-    tokenizer: AutoTokenizer,
     train_dataloader: torch.utils.data.DataLoader,
     test_dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
@@ -23,7 +26,6 @@ def train(
     Args:
         n_epochs (int): number of epochs to train.
         model (AutoModelForQuestionAnswering): model.
-        tokenizer (AutoTokenizer): tokenizer.
         train_dataloader (torch.utils.data.DataLoader): train_dataloader.
         test_dataloader (torch.utils.data.DataLoader): test_dataloader.
         optimizer (torch.optim.Optimizer): optimizer.
@@ -37,7 +39,6 @@ def train(
 
         train_epoch(
             model=model,
-            tokenizer=tokenizer,
             dataloader=train_dataloader,
             optimizer=optimizer,
             writer=writer,
@@ -46,7 +47,6 @@ def train(
         )
         evaluate_epoch(
             model=model,
-            tokenizer=tokenizer,
             dataloader=test_dataloader,
             writer=writer,
             device=device,
@@ -56,7 +56,6 @@ def train(
 
 def train_epoch(
     model: AutoModelForQuestionAnswering,
-    tokenizer: AutoTokenizer,
     dataloader: torch.utils.data.DataLoader,
     optimizer: torch.optim.Optimizer,
     writer: SummaryWriter,
@@ -68,7 +67,6 @@ def train_epoch(
 
     Args:
         model (AutoModelForQuestionAnswering): QA model.
-        tokenizer (AutoTokenizer): tokenizer.
         dataloader (torch.utils.data.DataLoader): dataloader.
         optimizer (torch.optim.Optimizer): optimizer.
         writer (SummaryWriter): tensorboard writer.
@@ -79,6 +77,7 @@ def train_epoch(
     model.train()
 
     epoch_loss = []
+    batch_metrics_list = defaultdict(list)
 
     for i, inputs in tqdm(
         enumerate(dataloader),
@@ -105,24 +104,53 @@ def train_epoch(
         with torch.no_grad():
             model.eval()
             outputs_inference = model(**inputs)
-            top_1_spans_batch = get_top_valid_spans(  # noqa: F841
-                tokenizer=tokenizer,
-                inputs=inputs,
-                outputs=outputs_inference,
-                offset_mapping_batch=offset_mapping_batch,
-                instances_batch=instances_batch,
-                n_best_size=1,
-                max_answer_length=100,
+            model.train()
+
+        spans_pred_batch_top_1 = get_top_valid_spans(
+            inputs=inputs,
+            outputs=outputs_inference,
+            offset_mapping_batch=offset_mapping_batch,
+            instances_batch=instances_batch,
+            n_best_size=1,
+            max_answer_length=100,
+        )
+
+        # TODO: maybe move into get_top_valid_spans
+        for i in range(len(spans_pred_batch_top_1)):
+            if not spans_pred_batch_top_1[i]:
+                empty_span = Span(
+                    token="",
+                    label="O",
+                    start_context_char_pos=0,
+                    end_context_char_pos=0,
+                )
+                spans_pred_batch_top_1[i] = [empty_span]
+
+        spans_true_batch = [instance.answer for instance in instances_batch]
+
+        batch_metrics = compute_metrics(
+            spans_true_batch=spans_true_batch,
+            spans_pred_batch_top_1=spans_pred_batch_top_1,
+        )
+
+        for metric_name, metric_value in batch_metrics.items():
+            batch_metrics_list[metric_name].append(metric_value)
+            writer.add_scalar(
+                f"batch {metric_name} / train",
+                metric_value,
+                epoch * len(dataloader) + i,
             )
 
     avg_loss = np.mean(epoch_loss)
     print(f"Train loss: {avg_loss}\n")
     writer.add_scalar("loss / train", avg_loss, epoch)
 
+    for metric_name, metric_value_list in batch_metrics_list.items():
+        writer.add_scalar(f"{metric_name} / train", np.mean(metric_value_list), epoch)
+
 
 def evaluate_epoch(
     model: AutoModelForQuestionAnswering,
-    tokenizer: AutoTokenizer,
     dataloader: torch.utils.data.DataLoader,
     writer: SummaryWriter,
     device: torch.device,
@@ -133,7 +161,6 @@ def evaluate_epoch(
 
     Args:
         model (AutoModelForQuestionAnswering): model.
-        tokenizer (AutoTokenizer): tokenizer.
         dataloader (torch.utils.data.DataLoader): dataloader.
         writer (SummaryWriter): tensorboard writer.
         device (torch.device): cpu or cuda.
@@ -152,8 +179,10 @@ def evaluate_epoch(
             desc="loop over test batches",
         ):
 
+            # instances_batch = inputs.pop("instances")
+
             inputs = inputs.to(device)
-            # offset_mapping_batch = inputs.pop("offset_mapping")  # TODO
+            # offset_mapping_batch = inputs.pop("offset_mapping")
 
             outputs = model(**inputs)
             loss = outputs.loss

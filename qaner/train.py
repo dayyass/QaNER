@@ -99,7 +99,6 @@ if __name__ == "__main__":
     train(
         n_epochs=2,  # TODO: remove hardcode
         model=model,
-        tokenizer=tokenizer,
         train_dataloader=train_dataloader,
         test_dataloader=test_dataloader,
         optimizer=optimizer,

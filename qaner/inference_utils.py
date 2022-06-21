@@ -7,7 +7,6 @@ from data_utils import Instance, Span
 
 
 def get_top_valid_spans(
-    tokenizer: transformers.AutoTokenizer,
     inputs: transformers.tokenization_utils_base.BatchEncoding,
     outputs: transformers.tokenization_utils_base.BatchEncoding,
     offset_mapping_batch: torch.Tensor,
@@ -20,7 +19,6 @@ def get_top_valid_spans(
     https://huggingface.co/docs/transformers/tasks/question_answering
 
     Args:
-        tokenizer (transformers.AutoTokenizer): tokenizer.
         inputs (transformers.tokenization_utils_base.BatchEncoding): inputs.
         outputs (transformers.tokenization_utils_base.BatchEncoding): outputs.
         offset_mapping_batch (torch.Tensor): offset mapping.
@@ -44,10 +42,7 @@ def get_top_valid_spans(
 
     # TODO: optimize it
     for i in range(batch_size):
-
-        # TODO: think how extract initial context (not lowercase)
-        context = tokenizer.decode(inputs["input_ids"][i])
-        context = context.split(tokenizer.sep_token)[1].strip()
+        context = instances_batch[i].context
 
         offset_mapping = offset_mapping_batch[i].cpu().numpy()
         mask = inputs["token_type_ids"][i].bool().cpu().numpy()
@@ -77,13 +72,14 @@ def get_top_valid_spans(
             ):
                 continue
             if start_index <= end_index:
-                start_char = offset_mapping[start_index][0]
-                end_char = offset_mapping[end_index][1]
+                start_context_char_char, end_context_char_char = offset_mapping[
+                    start_index
+                ]
                 span = Span(
-                    token=context[start_char:end_char],
+                    token=context[start_context_char_char:end_context_char_char],
                     label=instances_batch[i].answer.label,
-                    start_pos=start_char,
-                    end_pos=end_char,
+                    start_context_char_pos=start_context_char_char,
+                    end_context_char_pos=end_context_char_char,
                 )
                 top_valid_spans.append(span)
         top_valid_spans_batch.append(top_valid_spans)

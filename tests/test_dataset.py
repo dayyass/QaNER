@@ -24,9 +24,9 @@ def validate_spans(
     ):
         for span in labels:
             token = span.token
-            start_pos = span.start_pos
-            end_pos = span.end_pos
-            assert token == sentence[start_pos:end_pos]
+            start_context_char_pos = span.start_context_char_pos
+            end_context_char_pos = span.end_context_char_pos
+            assert token == sentence[start_context_char_pos:end_context_char_pos]
     return True
 
 
@@ -40,6 +40,7 @@ tokenizer_kwargs = {  # TODO: validate it
     "truncation": "only_second",
     "padding": True,
     "return_tensors": "pt",
+    "return_offsets_mapping": True,
 }
 
 
@@ -81,8 +82,8 @@ class TestDataset(unittest.TestCase):
             answer=Span(
                 token="",
                 label="O",
-                start_pos=0,
-                end_pos=0,
+                start_context_char_pos=0,
+                end_context_char_pos=0,
             ),
         )
 
@@ -95,8 +96,8 @@ class TestDataset(unittest.TestCase):
             answer=Span(
                 token="EU",
                 label="ORG",
-                start_pos=0,
-                end_pos=2,
+                start_context_char_pos=0,
+                end_context_char_pos=2,
             ),
         )
 
@@ -109,8 +110,8 @@ class TestDataset(unittest.TestCase):
             answer=Span(
                 token="German",
                 label="MISC",
-                start_pos=11,
-                end_pos=17,
+                start_context_char_pos=11,
+                end_context_char_pos=17,
             ),
         )
 
@@ -124,8 +125,8 @@ class TestDataset(unittest.TestCase):
             answer=Span(
                 token="European Commission",
                 label="ORG",
-                start_pos=4,
-                end_pos=23,
+                start_context_char_pos=4,
+                end_context_char_pos=23,
             ),
         )
 
@@ -139,8 +140,8 @@ class TestDataset(unittest.TestCase):
             answer=Span(
                 token="Nikolaus van der Pas",
                 label="PER",
-                start_pos=123,
-                end_pos=143,
+                start_context_char_pos=123,
+                end_context_char_pos=143,
             ),
         )
 
@@ -222,15 +223,82 @@ class TestCollator(unittest.TestCase):
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             ]
         )
+        batch_true["offset_mapping"] = torch.tensor(
+            [
+                [
+                    [0, 0],
+                    [0, 4],
+                    [5, 7],
+                    [8, 11],
+                    [12, 20],
+                    [20, 21],
+                    [0, 0],
+                    [0, 2],
+                    [3, 10],
+                    [11, 17],
+                    [18, 22],
+                    [23, 25],
+                    [26, 33],
+                    [34, 41],
+                    [42, 46],
+                    [47, 48],
+                    [0, 0],
+                ],
+                [
+                    [0, 0],
+                    [0, 4],
+                    [5, 7],
+                    [8, 11],
+                    [12, 18],
+                    [18, 19],
+                    [0, 0],
+                    [0, 2],
+                    [3, 10],
+                    [11, 17],
+                    [18, 22],
+                    [23, 25],
+                    [26, 33],
+                    [34, 41],
+                    [42, 46],
+                    [47, 48],
+                    [0, 0],
+                ],
+            ]
+        )
         batch_true["start_positions"] = torch.tensor([0, 0])
         batch_true["end_positions"] = torch.tensor([0, 0])
+        batch_true["instances"] = [
+            Instance(
+                context="EU rejects German call to boycott British lamb .",
+                question="What is the location?",
+                answer=Span(
+                    token="",
+                    label="O",
+                    start_context_char_pos=0,
+                    end_context_char_pos=0,
+                ),
+            ),
+            Instance(
+                context="EU rejects German call to boycott British lamb .",
+                question="What is the person?",
+                answer=Span(
+                    token="",
+                    label="O",
+                    start_context_char_pos=0,
+                    end_context_char_pos=0,
+                ),
+            ),
+        ]
 
         batch_pred = next(iter(dataloader))
 
         for key in batch_true:
-            self.assertTrue(
-                torch.allclose(batch_true[key], batch_pred[key]),
-            )
+            if key == "instances":
+                self.assertListEqual(batch_true[key], batch_pred[key])
+            else:
+                self.assertTrue(
+                    torch.allclose(batch_true[key], batch_pred[key]),
+                )
 
 
 if __name__ == "__main__":

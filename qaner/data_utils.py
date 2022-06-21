@@ -3,7 +3,9 @@ from typing import List, Tuple
 
 from tqdm import tqdm, trange
 
-Span = namedtuple("Span", ["token", "label", "start_pos", "end_pos"])
+Span = namedtuple(
+    "Span", ["token", "label", "start_context_char_pos", "end_context_char_pos"]
+)
 Instance = namedtuple("Instance", ["context", "question", "answer"])
 
 
@@ -82,7 +84,7 @@ def prepare_sentences_and_spans(
     qa_sentences, qa_labels = [], []
 
     for i in trange(len(token_seq)):
-        current_pos = 0
+        current_char_pos = 0
         qa_sent, qa_lab = [], []
         for token, label in zip(token_seq[i], label_seq[i]):
             qa_sent.append(token)
@@ -90,11 +92,11 @@ def prepare_sentences_and_spans(
                 span = Span(
                     token=token,
                     label=label,
-                    start_pos=current_pos,
-                    end_pos=current_pos + len(token),
+                    start_context_char_pos=current_char_pos,
+                    end_context_char_pos=current_char_pos + len(token),
                 )
                 qa_lab.append(span)
-            current_pos += len(token) + 1
+            current_char_pos += len(token) + 1
         qa_sentences.append(" ".join(qa_sent))
         qa_labels.append(qa_lab)
 
@@ -106,8 +108,8 @@ def prepare_sentences_and_spans(
                 span_v2 = Span(
                     token=span.token,
                     label=span.label.split("-")[-1],
-                    start_pos=span.start_pos,
-                    end_pos=span.end_pos,
+                    start_context_char_pos=span.start_context_char_pos,
+                    end_context_char_pos=span.end_context_char_pos,
                 )
                 qa_lab_v2.append(span_v2)
             elif span.label.startswith("I-"):
@@ -115,8 +117,8 @@ def prepare_sentences_and_spans(
                 span_v2 = Span(  # TODO: maybe use Span as dataclass
                     token=f"{span_v2.token} {span.token}",
                     label=span_v2.label,
-                    start_pos=span_v2.start_pos,
-                    end_pos=span.end_pos,
+                    start_context_char_pos=span_v2.start_context_char_pos,
+                    end_context_char_pos=span.end_context_char_pos,
                 )
                 qa_lab_v2[-1] = span_v2
             else:
