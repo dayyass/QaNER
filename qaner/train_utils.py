@@ -122,15 +122,15 @@ def train_epoch(
         )
 
         # TODO: maybe move into get_top_valid_spans
-        for i in range(len(spans_pred_batch_top_1)):
-            if not spans_pred_batch_top_1[i]:
+        for idx in range(len(spans_pred_batch_top_1)):
+            if not spans_pred_batch_top_1[idx]:
                 empty_span = Span(
                     token="",
                     label="O",  # TODO: maybe not "O" label
                     start_context_char_pos=0,
                     end_context_char_pos=0,
                 )
-                spans_pred_batch_top_1[i] = [empty_span]
+                spans_pred_batch_top_1[idx] = [empty_span]
 
         spans_true_batch = [instance.answer for instance in instances_batch]
 
@@ -218,15 +218,15 @@ def evaluate_epoch(
             )
 
             # TODO: maybe move into get_top_valid_spans
-            for i in range(len(spans_pred_batch_top_1)):
-                if not spans_pred_batch_top_1[i]:
+            for idx in range(len(spans_pred_batch_top_1)):
+                if not spans_pred_batch_top_1[idx]:
                     empty_span = Span(
                         token="",
                         label="O",  # TODO: maybe not "O" label
                         start_context_char_pos=0,
                         end_context_char_pos=0,
                     )
-                    spans_pred_batch_top_1[i] = [empty_span]
+                    spans_pred_batch_top_1[idx] = [empty_span]
 
             # TODO: change metrics calculation for inference time
             spans_true_batch = [instance.answer for instance in instances_batch]
