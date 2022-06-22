@@ -1,12 +1,14 @@
 from typing import Any, Dict
 
 import torch
+from arg_parse import get_inference_args
 from data_utils import Instance, Span
 from inference_utils import get_top_valid_spans
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 from utils import set_global_seed
 
 
+# TODO: add batch inference
 def predict(
     context: str,
     question: str,  # TODO: change with entity type
@@ -73,18 +75,19 @@ def predict(
 
 if __name__ == "__main__":
 
-    # TODO argparse
-    # TODO: add batch inference
-    context = "\" We do n't support any such recommendation because we do n't see any grounds for it , \" the Commission 's chief spokesman Nikolaus van der Pas told a news briefing ."
-    question = "What is the organization?"
+    # argparse
+    args = get_inference_args()
 
-    set_global_seed(42)  # TODO: remove hardcode
+    set_global_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # bert model
-    model_name = "dayyass/qaner-conll-bert-base-uncased"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForQuestionAnswering.from_pretrained(model_name).eval().to(device)
+    tokenizer = AutoTokenizer.from_pretrained(args.path_to_trained_model)
+    model = (
+        AutoModelForQuestionAnswering.from_pretrained(args.path_to_trained_model)
+        .eval()
+        .to(device)
+    )
 
     # TODO: validate it
     tokenizer_kwargs = {
@@ -96,8 +99,8 @@ if __name__ == "__main__":
     }
 
     prediction = predict(
-        context=context,
-        question=question,
+        context=args.context,
+        question=args.question,
         model=model,
         tokenizer=tokenizer,
         tokenizer_kwargs=tokenizer_kwargs,
