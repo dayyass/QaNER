@@ -27,7 +27,7 @@ def compute_metrics(
     )
 
     accuracy, precision, recall, f1 = 0.0, 0.0, 0.0, 0.0
-    precision_denominator, recall_denominator = 0, 0
+    accuracy_denominator, precision_denominator, recall_denominator = 0, 0, 0
 
     for span_true, span_pred in zip(spans_true_batch, spans_pred_batch_top_1):
         span_pred = span_pred[0]
@@ -36,6 +36,7 @@ def compute_metrics(
         if (span_true == empty_span) and (span_pred == empty_span):
             continue
 
+        accuracy_denominator += 1
         if span_true == span_pred:
             accuracy += 1
 
@@ -53,8 +54,8 @@ def compute_metrics(
             if span_true == span_pred:
                 recall += 1
 
-    accuracy /= len(spans_true_batch)
-
+    if accuracy_denominator != 0:
+        accuracy /= accuracy_denominator
     if precision_denominator != 0:
         precision /= precision_denominator
     if recall_denominator != 0:

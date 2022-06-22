@@ -88,6 +88,11 @@ def train_epoch(
 
         instances_batch = inputs.pop("instances")
 
+        context_list, question_list = [], []
+        for instance in instances_batch:
+            context_list.append(instance.context)
+            question_list.append(instance.question)
+
         inputs = inputs.to(device)
         offset_mapping_batch = inputs.pop("offset_mapping")
 
@@ -107,10 +112,11 @@ def train_epoch(
             model.train()
 
         spans_pred_batch_top_1 = get_top_valid_spans(
+            context_list=context_list,
+            question_list=question_list,
             inputs=inputs,
             outputs=outputs_inference,
             offset_mapping_batch=offset_mapping_batch,
-            instances_batch=instances_batch,
             n_best_size=1,
             max_answer_length=100,  # TODO: remove hardcode
         )
@@ -120,7 +126,7 @@ def train_epoch(
             if not spans_pred_batch_top_1[i]:
                 empty_span = Span(
                     token="",
-                    label="O",
+                    label="O",  # TODO: maybe not "O" label
                     start_context_char_pos=0,
                     end_context_char_pos=0,
                 )
@@ -185,6 +191,11 @@ def evaluate_epoch(
 
             instances_batch = inputs.pop("instances")
 
+            context_list, question_list = [], []
+            for instance in instances_batch:
+                context_list.append(instance.context)
+                question_list.append(instance.question)
+
             inputs = inputs.to(device)
             offset_mapping_batch = inputs.pop("offset_mapping")
 
@@ -197,10 +208,11 @@ def evaluate_epoch(
             )
 
             spans_pred_batch_top_1 = get_top_valid_spans(
+                context_list=context_list,
+                question_list=question_list,
                 inputs=inputs,
                 outputs=outputs,
                 offset_mapping_batch=offset_mapping_batch,
-                instances_batch=instances_batch,
                 n_best_size=1,  # TODO: remove hardcode
                 max_answer_length=100,  # TODO: remove hardcode
             )
@@ -210,7 +222,7 @@ def evaluate_epoch(
                 if not spans_pred_batch_top_1[i]:
                     empty_span = Span(
                         token="",
-                        label="O",
+                        label="O",  # TODO: maybe not "O" label
                         start_context_char_pos=0,
                         end_context_char_pos=0,
                     )

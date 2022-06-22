@@ -3,14 +3,15 @@ from typing import List
 import numpy as np
 import torch
 import transformers
-from data_utils import Instance, Span
+from data_utils import Span
 
 
 def get_top_valid_spans(
+    context_list: List[str],
+    question_list: List[str],
     inputs: transformers.tokenization_utils_base.BatchEncoding,
     outputs: transformers.tokenization_utils_base.BatchEncoding,
     offset_mapping_batch: torch.Tensor,
-    instances_batch: List[Instance],
     n_best_size: int = 1,
     max_answer_length: int = 100,
 ) -> List[List[Span]]:
@@ -19,10 +20,11 @@ def get_top_valid_spans(
     https://huggingface.co/docs/transformers/tasks/question_answering
 
     Args:
+        context_list (List[str]): context strings in  batch.
+        question_list (List[str]): question strings in batch.
         inputs (transformers.tokenization_utils_base.BatchEncoding): inputs.
         outputs (transformers.tokenization_utils_base.BatchEncoding): outputs.
         offset_mapping_batch (torch.Tensor): offset mapping.
-        instances_batch (List[Instance]): instances.
         n_best_size (int): number of best spans. Defaults to 1.
         max_answer_length (int): max answer length. Defaults to 100.
 
@@ -32,17 +34,26 @@ def get_top_valid_spans(
 
     batch_size = len(offset_mapping_batch)
 
+    # TODO: remove hardcode
+    entity_mapper = {
+        "location": "LOC",
+        "person": "PER",
+        "organization": "ORG",
+        "miscellaneous entity": "MISC",
+    }
+
+    assert batch_size == len(context_list)
+    assert batch_size == len(question_list)
     assert batch_size == len(inputs["input_ids"])
     assert batch_size == len(inputs["token_type_ids"])
     assert batch_size == len(outputs["start_logits"])
     assert batch_size == len(outputs["end_logits"])
-    assert batch_size == len(instances_batch)
 
     top_valid_spans_batch = []
 
     # TODO: optimize it
     for i in range(batch_size):
-        context = instances_batch[i].context
+        context = context_list[i]
 
         offset_mapping = offset_mapping_batch[i].cpu().numpy()
         mask = inputs["token_type_ids"][i].bool().cpu().numpy()
@@ -77,7 +88,9 @@ def get_top_valid_spans(
                 ]
                 span = Span(
                     token=context[start_context_char_char:end_context_char_char],
-                    label=instances_batch[i].answer.label,
+                    label=entity_mapper[  # TODO: remove hardcode
+                        question_list[i].lstrip("What is the ").rstrip("?")
+                    ],
                     start_context_char_pos=start_context_char_char,
                     end_context_char_pos=end_context_char_char,
                 )
