@@ -84,7 +84,7 @@ def get_top_valid_spans(
                 ]
                 span = Span(
                     token=context[start_context_char_char:end_context_char_char],
-                    label=inv_prompt_mapper[
+                    label=inv_prompt_mapper[  # TODO: add inference exception
                         question_list[i].lstrip("What is the ").rstrip("?")
                     ],
                     start_context_char_pos=start_context_char_char,

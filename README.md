@@ -1,6 +1,13 @@
 # QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition
 Unofficial implementation of [QaNER](https://arxiv.org/abs/2203.01543).
 
+You can adopt this pipeline for arbitrary [CoNLL-2003-like format](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
+
+### CoNLL-2003
+Pipeline results on CoNLL-2003 dataset:
+- [Metrics](https://tensorboard.dev/experiment/FEsbNJdmSd2LGVhga8Ku0Q/)
+- [Trained Hugging Face model](https://huggingface.co/dayyass/qaner-conll-bert-base-uncased)
+
 ## How to use
 ### Training
 Script for training QaNER model:
@@ -21,7 +28,7 @@ python qaner/train.py \
 Required arguments:
 - **--bert_model_name** - base bert model for QaNER fine-tuning
 - **--path_to_prompt_mapper** - path to prompt mapper json file
-- **--path_to_train_data** - path to train data ([CoNLL-2003 like format](https://github.com/dayyass/QaNER/tree/main/data/conll2003))
+- **--path_to_train_data** - path to train data ([CoNLL-2003-like format](https://github.com/dayyass/QaNER/tree/main/data/conll2003))
 - **--path_to_test_data** - path to test data ([CoNLL-2003-like format](https://github.com/dayyass/QaNER/tree/main/data/conll2003))
 - **--path_to_save_model** - path to save trained QaNER model
 - **--n_epochs** - number of epochs to fine-tune
@@ -40,9 +47,18 @@ python qaner/inference.py \
 --question 'What is the organization?' \
 --path_to_prompt_mapper 'prompt_mapper.json' \
 --path_to_trained_model 'dayyass/qaner-conll-bert-base-uncased' \
---n_best_size 5 \
+--n_best_size 1 \
 --max_answer_length 100 \
 --seed 42
+```
+
+Result:
+```
+question: What is the organization?
+
+context: EU rejects German call to boycott British lamb .
+
+answer: [Span(token='EU', label='ORG', start_context_char_pos=0, end_context_char_pos=2)]
 ```
 
 Required arguments:
@@ -67,7 +83,7 @@ Python >= 3.7
 
 ### Citation
 ```bibtex
-@misc{liu2021qaner,
+@misc{liu2022qaner,
     title         = {QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition},
     author        = {Andy T. Liu and Wei Xiao and Henghui Zhu and Dejiao Zhang and Shang-Wen Li and Andrew Arnold},
     year          = {2022},

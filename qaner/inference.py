@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 import torch
 from arg_parse import get_inference_args
-from data_utils import Instance, Span
+from data_utils import Instance
 from inference_utils import get_top_valid_spans
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 from utils import set_global_seed
@@ -43,7 +43,7 @@ def predict(
     with torch.no_grad():
         outputs = model(**inputs)
 
-    spans_pred_batch_top_1 = get_top_valid_spans(
+    spans_pred_batch_top = get_top_valid_spans(
         context_list=[context],
         question_list=[question],
         prompt_mapper=prompt_mapper,
@@ -52,30 +52,20 @@ def predict(
         offset_mapping_batch=offset_mapping_batch,
         n_best_size=n_best_size,
         max_answer_length=max_answer_length,
-    )
+    )[0]
 
-    # TODO: maybe move into get_top_valid_spans
-    # TODO: maybe remove it
-    for i in range(len(spans_pred_batch_top_1)):
-        if not spans_pred_batch_top_1[i]:
-            empty_span = Span(
-                token="",
-                label="O",  # TODO: maybe not "O" label
-                start_context_char_pos=0,
-                end_context_char_pos=0,
-            )
-            spans_pred_batch_top_1[i] = [empty_span]
+    # TODO: validate it
+    spans_pred_batch_top = [span for span in spans_pred_batch_top if span]
 
-    predicted_answer_span = spans_pred_batch_top_1[0][0]  # TODO: remove hardcode
-
-    start_pos = predicted_answer_span.start_context_char_pos
-    end_pos = predicted_answer_span.end_context_char_pos
-    assert predicted_answer_span.token == context[start_pos:end_pos]
+    for predicted_answer_span in spans_pred_batch_top:
+        start_pos = predicted_answer_span.start_context_char_pos
+        end_pos = predicted_answer_span.end_context_char_pos
+        assert predicted_answer_span.token == context[start_pos:end_pos]
 
     prediction = Instance(
         context=context,
         question=question,
-        answer=predicted_answer_span,
+        answer=spans_pred_batch_top,
     )
 
     return prediction
