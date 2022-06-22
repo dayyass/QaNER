@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 import torch
@@ -9,6 +9,7 @@ from data_utils import Span
 def get_top_valid_spans(
     context_list: List[str],
     question_list: List[str],
+    prompt_mapper: Dict[str, str],
     inputs: transformers.tokenization_utils_base.BatchEncoding,
     outputs: transformers.tokenization_utils_base.BatchEncoding,
     offset_mapping_batch: torch.Tensor,
@@ -22,6 +23,7 @@ def get_top_valid_spans(
     Args:
         context_list (List[str]): context strings in  batch.
         question_list (List[str]): question strings in batch.
+        prompt_mapper (Dict[str, str]): prompt mapper.
         inputs (transformers.tokenization_utils_base.BatchEncoding): inputs.
         outputs (transformers.tokenization_utils_base.BatchEncoding): outputs.
         offset_mapping_batch (torch.Tensor): offset mapping.
@@ -34,13 +36,7 @@ def get_top_valid_spans(
 
     batch_size = len(offset_mapping_batch)
 
-    # TODO: remove hardcode
-    entity_mapper = {
-        "location": "LOC",
-        "person": "PER",
-        "organization": "ORG",
-        "miscellaneous entity": "MISC",
-    }
+    inv_prompt_mapper = {v: k for k, v in prompt_mapper.items()}
 
     assert batch_size == len(context_list)
     assert batch_size == len(question_list)
@@ -88,7 +84,7 @@ def get_top_valid_spans(
                 ]
                 span = Span(
                     token=context[start_context_char_char:end_context_char_char],
-                    label=entity_mapper[  # TODO: remove hardcode
+                    label=inv_prompt_mapper[
                         question_list[i].lstrip("What is the ").rstrip("?")
                     ],
                     start_context_char_pos=start_context_char_char,

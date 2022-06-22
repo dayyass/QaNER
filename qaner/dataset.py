@@ -6,13 +6,16 @@ from data_utils import Instance, Span
 from tqdm import tqdm
 
 
+# TODO: add documentation
 class Dataset(torch.utils.data.Dataset):
     def __init__(
         self,
         qa_sentences: List[str],
         qa_labels: List[List[Span]],
+        prompt_mapper: Dict[str, str],
     ):
         super().__init__()
+        self.prompt_mapper = prompt_mapper
         self.dataset = self._prepare_dataset(
             qa_sentences=qa_sentences,
             qa_labels=qa_labels,
@@ -21,11 +24,11 @@ class Dataset(torch.utils.data.Dataset):
     def __len__(self) -> int:
         return len(self.dataset)
 
-    def __getitem__(self, idx) -> Instance:
+    def __getitem__(self, idx: int) -> Instance:
         return self.dataset[idx]
 
-    @staticmethod
     def _prepare_dataset(
+        self,
         qa_sentences: List[str],
         qa_labels: List[List[Span]],
     ) -> List[Instance]:
@@ -36,13 +39,7 @@ class Dataset(torch.utils.data.Dataset):
             zip(qa_sentences, qa_labels),
             desc="prepare_dataset",
         ):
-            # TODO: remove hardcode
-            for label_tag, label_name in [
-                ("LOC", "location"),
-                ("PER", "person"),
-                ("ORG", "organization"),
-                ("MISC", "miscellaneous entity"),
-            ]:
+            for label_tag, label_name in self.prompt_mapper.items():
                 question_prompt = f"What is the {label_name}?"
 
                 answer_list = []
@@ -75,6 +72,7 @@ class Dataset(torch.utils.data.Dataset):
         return dataset
 
 
+# TODO: add documentation
 class Collator:
     def __init__(
         self,
@@ -116,6 +114,7 @@ class Collator:
         for offset_mapping, start_end_context_char_pos in zip(
             offset_mapping_batch, start_end_context_char_pos_list
         ):
+            # TODO: add comment
             if start_end_context_char_pos == [0, 0]:
                 start_token_pos_list.append(0)
                 end_token_pos_list.append(0)

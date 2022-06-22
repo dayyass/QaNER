@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict
 
 import torch
@@ -12,9 +13,12 @@ from utils import set_global_seed
 def predict(
     context: str,
     question: str,  # TODO: change with entity type
+    prompt_mapper: Dict[str, str],
     model: AutoModelForQuestionAnswering,
     tokenizer: AutoTokenizer,
     tokenizer_kwargs: Dict[str, Any],
+    n_best_size: int = 1,
+    max_answer_length: int = 100,
 ) -> Instance:
     """
     Predict function.
@@ -22,9 +26,12 @@ def predict(
     Args:
         context (str): context string.
         question (str): question string.
+        prompt_mapper (Dict[str, str]): prompt mapper.
         model (AutoModelForQuestionAnswering): trained QaNER model.
         tokenizer (AutoTokenizer): tokenizer for trained QaNER model.
         tokenizer_kwargs (Dict[str, Any]): tokenizer kwargs.
+        n_best_size (int): number of best QA answers to consider. Defaults to 1.
+        max_answer_length (int): entity max length to eliminate very long entities. Defaults to 100.
 
     Returns:
         Instance: predicted instance.
@@ -39,11 +46,12 @@ def predict(
     spans_pred_batch_top_1 = get_top_valid_spans(
         context_list=[context],
         question_list=[question],
+        prompt_mapper=prompt_mapper,
         inputs=inputs,
         outputs=outputs,
         offset_mapping_batch=offset_mapping_batch,
-        n_best_size=1,  # TODO: remove hardcode
-        max_answer_length=100,  # TODO: remove hardcode
+        n_best_size=n_best_size,
+        max_answer_length=max_answer_length,
     )
 
     # TODO: maybe move into get_top_valid_spans
@@ -98,12 +106,18 @@ if __name__ == "__main__":
         "return_offsets_mapping": True,
     }
 
+    with open(args.path_to_prompt_mapper, mode="r", encoding="utf-8") as fp:
+        prompt_mapper = json.load(fp)
+
     prediction = predict(
         context=args.context,
         question=args.question,
+        prompt_mapper=prompt_mapper,
         model=model,
         tokenizer=tokenizer,
         tokenizer_kwargs=tokenizer_kwargs,
+        n_best_size=args.n_best_size,
+        max_answer_length=args.max_answer_length,
     )
 
     print(f"\nquestion: {prediction.question}\n")

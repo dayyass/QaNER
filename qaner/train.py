@@ -1,3 +1,5 @@
+import json
+
 import torch
 from arg_parse import get_train_args
 from data_utils import prepare_sentences_and_spans, read_conll_data_format
@@ -34,6 +36,10 @@ if __name__ == "__main__":
     # dataset and dataloader (train)
     # TODO: add more general read_data function
     # TODO: add valid data
+
+    with open(args.path_to_prompt_mapper, mode="r", encoding="utf-8") as fp:
+        prompt_mapper = json.load(fp)
+
     train_token_seq, train_label_seq = read_conll_data_format(
         path=args.path_to_train_data,
         sep=" ",  # TODO: remove hardcode
@@ -49,6 +55,7 @@ if __name__ == "__main__":
     train_dataset = Dataset(
         qa_sentences=train_qa_sentences,
         qa_labels=train_qa_labels,
+        prompt_mapper=prompt_mapper,
     )
 
     # dataset and dataloader (test)
@@ -67,6 +74,7 @@ if __name__ == "__main__":
     test_dataset = Dataset(
         qa_sentences=test_qa_sentences,
         qa_labels=test_qa_labels,
+        prompt_mapper=prompt_mapper,
     )
 
     collator = Collator(

@@ -18,6 +18,12 @@ def get_train_args() -> Namespace:
         help="bert model name",
     )
     parser.add_argument(
+        "--path_to_prompt_mapper",
+        type=str,
+        required=True,
+        help="path to prompt mapper",
+    )
+    parser.add_argument(
         "--path_to_train_data",
         type=str,
         required=True,
@@ -95,10 +101,29 @@ def get_inference_args() -> Namespace:
         help="question prompt with entity name to extract",
     )
     parser.add_argument(
+        "--path_to_prompt_mapper",
+        type=str,
+        required=True,
+        help="path to prompt mapper",
+    )
+    parser.add_argument(
         "--path_to_trained_model",
         type=str,
         required=True,
         help="path to trained QaNER model",
+    )
+    parser.add_argument(
+        "--n_best_size",
+        type=int,
+        required=True,
+        help="number of best QA answers to consider",
+    )
+    parser.add_argument(
+        "--max_answer_length",
+        type=int,
+        required=False,
+        default=100,
+        help="entity max length",
     )
     parser.add_argument(
         "--seed",

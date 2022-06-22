@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from typing import List
@@ -56,9 +57,13 @@ qa_sentences, qa_labels = prepare_sentences_and_spans(
     label_seq=label_seq,
 )
 
+with open("prompt_mapper.json", mode="r", encoding="utf-8") as fp:
+    prompt_mapper = json.load(fp)
+
 dataset = Dataset(
     qa_sentences=qa_sentences,
     qa_labels=qa_labels,
+    prompt_mapper=prompt_mapper,
 )
 
 collator = Collator(

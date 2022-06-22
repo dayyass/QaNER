@@ -114,6 +114,7 @@ def train_epoch(
         spans_pred_batch_top_1 = get_top_valid_spans(
             context_list=context_list,
             question_list=question_list,
+            prompt_mapper=dataloader.dataset.prompt_mapper,
             inputs=inputs,
             outputs=outputs_inference,
             offset_mapping_batch=offset_mapping_batch,
@@ -137,6 +138,7 @@ def train_epoch(
         batch_metrics = compute_metrics(
             spans_true_batch=spans_true_batch,
             spans_pred_batch_top_1=spans_pred_batch_top_1,
+            prompt_mapper=dataloader.dataset.prompt_mapper,
         )
 
         for metric_name, metric_value in batch_metrics.items():
@@ -210,6 +212,7 @@ def evaluate_epoch(
             spans_pred_batch_top_1 = get_top_valid_spans(
                 context_list=context_list,
                 question_list=question_list,
+                prompt_mapper=dataloader.dataset.prompt_mapper,
                 inputs=inputs,
                 outputs=outputs,
                 offset_mapping_batch=offset_mapping_batch,
@@ -234,6 +237,7 @@ def evaluate_epoch(
             batch_metrics = compute_metrics(
                 spans_true_batch=spans_true_batch,
                 spans_pred_batch_top_1=spans_pred_batch_top_1,
+                prompt_mapper=dataloader.dataset.prompt_mapper,
             )
 
             for metric_name, metric_value in batch_metrics.items():

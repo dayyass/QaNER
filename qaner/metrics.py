@@ -8,6 +8,7 @@ from data_utils import Span
 def compute_metrics(
     spans_true_batch: List[Span],
     spans_pred_batch_top_1: List[List[Span]],
+    prompt_mapper: Dict[str, str],
 ) -> Dict[str, float]:
     """
     Compute NER metrics.
@@ -15,6 +16,7 @@ def compute_metrics(
     Args:
         spans_true_batch (List[Span]): targets.
         spans_pred_batch_top_1 (np.ndarray): predictions.
+        prompt_mapper (Dict[str, str]): prompt mapper.
 
     Returns:
         Dict[str, float]: metrics.
@@ -22,18 +24,13 @@ def compute_metrics(
 
     metrics = {}
 
-    # TODO: remove hardcode
-    entity_mapper = {
-        "O": 0,
-        "LOC": 1,
-        "PER": 2,
-        "ORG": 3,
-        "MISC": 4,
-    }
+    entity_mapper = {"O": 0}
+    for entity_tag in prompt_mapper:
+        entity_mapper[entity_tag] = len(entity_mapper)
 
-    ner_confusion_matrix = np.zeros((5, 5))  # TODO: remove hardcode
-    confusion_matrix_true_denominator = np.zeros(5)  # TODO: remove hardcode
-    confusion_matrix_pred_denominator = np.zeros(5)  # TODO: remove hardcode
+    ner_confusion_matrix = np.zeros((len(entity_mapper), len(entity_mapper)))
+    confusion_matrix_true_denominator = np.zeros(len(entity_mapper))
+    confusion_matrix_pred_denominator = np.zeros(len(entity_mapper))
 
     for span_true, span_pred in zip(spans_true_batch, spans_pred_batch_top_1):
         span_pred = span_pred[0]
