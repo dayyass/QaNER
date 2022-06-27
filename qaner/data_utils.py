@@ -9,31 +9,24 @@ Span = namedtuple(
 Instance = namedtuple("Instance", ["context", "question", "answer"])
 
 
-def read_conll_data_format(
+def read_bio_markup(
     path: str,
-    sep: str = "\t",
-    lower: bool = True,
-    verbose: bool = True,
 ) -> Tuple[List[List[str]], List[List[str]]]:
     """
-    Read data in CoNNL like format.
-    Tokens and labels separated on each line.
+    Read BIO-markup data.
+    Labels and tokens separated on each line with tab.
     Sentences are separated by empty line.
-    Labels should already be in necessary format, e.g. IO, BIO, BILUO, ...
 
     Data example:
-    token_11    label_11
-    token_12    label_12
-    token_21    label_21
-    token_22    label_22
-    token_23    label_23
+    label_11    token_11
+    label_12    token_12
+    label_21    token_21
+    label_22    token_22
+    label_23    token_23
     ...
 
     Args:
-        path (str): Path to txt file.
-        sep (str, optional): Separator. Defaults to "\t".
-        lower (bool, optional): Lowercase. Defaults to True.
-        verbose (bool, optional): Verbose. Defaults to True.
+        path (str): Path to BIO-markup data.
 
     Returns:
         Tuple[List[List[str]], List[List[str]]]: Tokens and labels lists.
@@ -44,13 +37,9 @@ def read_conll_data_format(
     with open(path, mode="r") as fp:
         tokens = []
         labels = []
-        if verbose:
-            fp = tqdm(fp, desc="read_conll")
-        for line in fp:
+        for line in tqdm(fp, desc="read bio-markup"):
             if line != "\n":
-                token, label = line.strip().split(sep)
-                if lower:
-                    token = token.lower()
+                label, token = line.strip().split("\t")
                 tokens.append(token)
                 labels.append(label)
             else:

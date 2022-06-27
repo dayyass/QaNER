@@ -9,7 +9,7 @@ from transformers import AutoTokenizer, BatchEncoding
 
 sys.path.append("qaner")  # TODO: fix it
 
-from data_utils import prepare_sentences_and_spans, read_conll_data_format  # noqa: E402
+from data_utils import prepare_sentences_and_spans, read_bio_markup  # noqa: E402
 from dataset import Collator, Dataset, Instance, Span  # noqa: E402
 from utils import set_global_seed  # noqa: E402
 
@@ -45,12 +45,7 @@ tokenizer_kwargs = {  # TODO: validate it
 }
 
 
-token_seq, label_seq = read_conll_data_format(
-    path="data/conll2003/train.txt",
-    sep=" ",
-    lower=False,
-    verbose=True,
-)
+token_seq, label_seq = read_bio_markup("data/conll2003/train.bio")
 
 qa_sentences, qa_labels = prepare_sentences_and_spans(
     token_seq=token_seq,

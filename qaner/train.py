@@ -2,7 +2,7 @@ import json
 
 import torch
 from arg_parse import get_train_args
-from data_utils import prepare_sentences_and_spans, read_conll_data_format
+from data_utils import prepare_sentences_and_spans, read_bio_markup
 from dataset import Collator, Dataset
 from torch.utils.tensorboard import SummaryWriter
 from train_utils import train
@@ -40,12 +40,7 @@ if __name__ == "__main__":
     with open(args.path_to_prompt_mapper, mode="r", encoding="utf-8") as fp:
         prompt_mapper = json.load(fp)
 
-    train_token_seq, train_label_seq = read_conll_data_format(
-        path=args.path_to_train_data,
-        sep=" ",  # TODO: remove hardcode
-        lower=False,  # TODO: remove hardcode
-        verbose=True,  # TODO: remove hardcode
-    )
+    train_token_seq, train_label_seq = read_bio_markup(args.path_to_train_data)
 
     train_qa_sentences, train_qa_labels = prepare_sentences_and_spans(
         token_seq=train_token_seq,
@@ -59,12 +54,7 @@ if __name__ == "__main__":
     )
 
     # dataset and dataloader (test)
-    test_token_seq, test_label_seq = read_conll_data_format(
-        path=args.path_to_test_data,
-        sep=" ",  # TODO: remove hardcode
-        lower=False,  # TODO: remove hardcode
-        verbose=True,  # TODO: remove hardcode
-    )
+    test_token_seq, test_label_seq = read_bio_markup(args.path_to_test_data)
 
     test_qa_sentences, test_qa_labels = prepare_sentences_and_spans(
         token_seq=test_token_seq,
