@@ -52,7 +52,7 @@ qa_sentences, qa_labels = prepare_sentences_and_spans(
     label_seq=label_seq,
 )
 
-with open("prompt_mapper.json", mode="r", encoding="utf-8") as fp:
+with open("data/conll2003/prompt_mapper.json", mode="r", encoding="utf-8") as fp:
     prompt_mapper = json.load(fp)
 
 dataset = Dataset(

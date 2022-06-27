@@ -1,0 +1,10 @@
+{
+    "Location": "location",
+    "Cuisine": "cuisine",
+    "Amenity": "amenity",
+    "Restaurant_Name": "restaurant name",
+    "Dish": "dish",
+    "Hours": "hours",
+    "Rating": "rating",
+    "Price": "price"
+}

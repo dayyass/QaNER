@@ -1,0 +1,14 @@
+{
+    "GENRE": "genre",
+    "ACTOR": "actor",
+    "TITLE": "title",
+    "YEAR": "year",
+    "RATING": "rating",
+    "PLOT": "plot",
+    "DIRECTOR": "director",
+    "RATINGS_AVERAGE": "average ratings",
+    "SONG": "song",
+    "CHARACTER": "character",
+    "REVIEW": "review",
+    "TRAILER": "trailer"
+}

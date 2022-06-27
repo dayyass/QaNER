@@ -14,7 +14,7 @@ Script for training QaNER model:
 ```
 python qaner/train.py \
 --bert_model_name 'bert-base-uncased' \
---path_to_prompt_mapper 'prompt_mapper.json' \
+--path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
 --path_to_train_data 'data/conll2003/train.bio' \
 --path_to_test_data 'data/conll2003/test.bio' \
 --path_to_save_model 'dayyass/qaner-conll-bert-base-uncased' \
@@ -45,7 +45,7 @@ Script for inference trained QaNER model:
 python qaner/inference.py \
 --context 'EU rejects German call to boycott British lamb .' \
 --question 'What is the organization?' \
---path_to_prompt_mapper 'prompt_mapper.json' \
+--path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
 --path_to_trained_model 'dayyass/qaner-conll-bert-base-uncased' \
 --n_best_size 1 \
 --max_answer_length 100 \
