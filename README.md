@@ -1,5 +1,5 @@
-# QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition
-Unofficial implementation of [QaNER](https://arxiv.org/abs/2203.01543).
+# QaNER
+Unofficial implementation of [*QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition*](https://arxiv.org/abs/2203.01543).
 
 You can adopt this pipeline for arbitrary [BIO-markup](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
 
