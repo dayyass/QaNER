@@ -1,6 +1,6 @@
 [![tests](https://github.com/dayyass/qaner/actions/workflows/tests.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/tests.yml)
 [![linter](https://github.com/dayyass/qaner/actions/workflows/linter.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/linter.yml)
-[![codecov](https://codecov.io/gh/dayyass/qaner/branch/main/graph/badge.svg?token=S3UKX8BFP3)](https://codecov.io/gh/dayyass/qaner)
+<!-- [![codecov](https://codecov.io/gh/dayyass/qaner/branch/main/graph/badge.svg?token=S3UKX8BFP3)](https://codecov.io/gh/dayyass/qaner) -->
 
 [![python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://github.com/dayyass/qaner#requirements)
 [![release (latest by date)](https://img.shields.io/github/v/release/dayyass/qaner)](https://github.com/dayyass/qaner/releases/latest)
