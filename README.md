@@ -17,7 +17,12 @@ Unofficial implementation of [*QaNER: Prompting Question Answering Models for Fe
 
 You can adopt this pipeline for arbitrary [BIO-markup](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
 
-### CoNLL-2003
+## Installation
+```
+pip install qaner
+```
+
+## CoNLL-2003
 Pipeline results on CoNLL-2003 dataset:
 - [Metrics](https://tensorboard.dev/experiment/FEsbNJdmSd2LGVhga8Ku0Q/)
 - [Trained Hugging Face model](https://huggingface.co/dayyass/qaner-conll-bert-base-uncased)
@@ -26,7 +31,7 @@ Pipeline results on CoNLL-2003 dataset:
 ### Training
 Script for training QaNER model:
 ```
-python qaner/train.py \
+qaner-train \
 --bert_model_name 'bert-base-uncased' \
 --path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
 --path_to_train_data 'data/conll2003/train.bio' \
@@ -56,7 +61,7 @@ Optional arguments:
 ### Infrerence
 Script for inference trained QaNER model:
 ```
-python qaner/inference.py \
+qaner-inference \
 --context 'EU rejects German call to boycott British lamb .' \
 --question 'What is the organization?' \
 --path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
@@ -92,10 +97,10 @@ Possible inference questions for CoNLL-2003:
 - What is the organization? (ORG)
 - What is the miscellaneous entity? (MISC)
 
-### Requirements
+## Requirements
 Python >= 3.7
 
-### Citation
+## Citation
 ```bibtex
 @misc{liu2022qaner,
     title         = {QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition},
