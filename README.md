@@ -1,9 +1,28 @@
+[![tests](https://github.com/dayyass/qaner/actions/workflows/tests.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/tests.yml)
+[![linter](https://github.com/dayyass/qaner/actions/workflows/linter.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/linter.yml)
+<!-- [![codecov](https://codecov.io/gh/dayyass/qaner/branch/main/graph/badge.svg?token=S3UKX8BFP3)](https://codecov.io/gh/dayyass/qaner) -->
+
+[![python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://github.com/dayyass/qaner#requirements)
+[![release (latest by date)](https://img.shields.io/github/v/release/dayyass/qaner)](https://github.com/dayyass/qaner/releases/latest)
+[![license](https://img.shields.io/github/license/dayyass/qaner?color=blue)](https://github.com/dayyass/qaner/blob/main/LICENSE)
+
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-black)](https://github.com/dayyass/qaner/blob/main/.pre-commit-config.yaml)
+[![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+[![pypi version](https://img.shields.io/pypi/v/qaner)](https://pypi.org/project/qaner)
+[![pypi downloads](https://img.shields.io/pypi/dm/qaner)](https://pypi.org/project/qaner)
+
 # QaNER
 Unofficial implementation of [*QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition*](https://arxiv.org/abs/2203.01543).
 
 You can adopt this pipeline for arbitrary [BIO-markup](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
 
-### CoNLL-2003
+## Installation
+```
+pip install qaner
+```
+
+## CoNLL-2003
 Pipeline results on CoNLL-2003 dataset:
 - [Metrics](https://tensorboard.dev/experiment/FEsbNJdmSd2LGVhga8Ku0Q/)
 - [Trained Hugging Face model](https://huggingface.co/dayyass/qaner-conll-bert-base-uncased)
@@ -12,7 +31,7 @@ Pipeline results on CoNLL-2003 dataset:
 ### Training
 Script for training QaNER model:
 ```
-python qaner/train.py \
+qaner-train \
 --bert_model_name 'bert-base-uncased' \
 --path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
 --path_to_train_data 'data/conll2003/train.bio' \
@@ -42,7 +61,7 @@ Optional arguments:
 ### Infrerence
 Script for inference trained QaNER model:
 ```
-python qaner/inference.py \
+qaner-inference \
 --context 'EU rejects German call to boycott British lamb .' \
 --question 'What is the organization?' \
 --path_to_prompt_mapper 'data/conll2003/prompt_mapper.json' \
@@ -78,10 +97,10 @@ Possible inference questions for CoNLL-2003:
 - What is the organization? (ORG)
 - What is the miscellaneous entity? (MISC)
 
-### Requirements
+## Requirements
 Python >= 3.7
 
-### Citation
+## Citation
 ```bibtex
 @misc{liu2022qaner,
     title         = {QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition},

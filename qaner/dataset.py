@@ -2,8 +2,9 @@ from typing import Any, Dict, List, Tuple
 
 import torch
 import transformers
-from data_utils import Instance, Span
 from tqdm import tqdm
+
+from qaner.data_utils import Instance, Span
 
 
 # TODO: add documentation

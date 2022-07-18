@@ -2,11 +2,12 @@ import json
 from typing import Any, Dict
 
 import torch
-from arg_parse import get_inference_args
-from data_utils import Instance
-from inference_utils import get_top_valid_spans
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-from utils import set_global_seed
+
+from qaner.arg_parse import get_inference_args
+from qaner.data_utils import Instance
+from qaner.inference_utils import get_top_valid_spans
+from qaner.utils import set_global_seed
 
 
 # TODO: add batch inference
@@ -71,7 +72,13 @@ def predict(
     return prediction
 
 
-if __name__ == "__main__":
+def main() -> int:
+    """
+    Main inference function.
+
+    Returns:
+        int: exit code.
+    """
 
     # argparse
     args = get_inference_args()
@@ -113,3 +120,9 @@ if __name__ == "__main__":
     print(f"\nquestion: {prediction.question}\n")
     print(f"context: {prediction.context}")
     print(f"\nanswer: {prediction.answer}\n")
+
+    return 0
+
+
+if __name__ == "__main__":
+    main()

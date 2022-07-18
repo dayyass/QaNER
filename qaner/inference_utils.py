@@ -3,7 +3,8 @@ from typing import Dict, List
 import numpy as np
 import torch
 import transformers
-from data_utils import Span
+
+from qaner.data_utils import Span
 
 
 def get_top_valid_spans(
@@ -85,7 +86,7 @@ def get_top_valid_spans(
                 span = Span(
                     token=context[start_context_char_char:end_context_char_char],
                     label=inv_prompt_mapper[  # TODO: add inference exception
-                        question_list[i].lstrip("What is the ").rstrip("?")
+                        question_list[i].split(r"What is the ")[-1].rstrip(r"?")
                     ],
                     start_context_char_pos=start_context_char_char,
                     end_context_char_pos=end_context_char_char,

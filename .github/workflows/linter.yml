@@ -1,0 +1,37 @@
+# This workflow will install Python dependencies and run linter
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# TODO: update linters
+
+name: linter
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install isort black flake8 mypy
+    - name: Code format check with isort
+      run: isort --check-only --profile black .
+    - name: Code format check with black
+      run: black --check .
+    - name: Code format check with flake8
+      run: flake8 --ignore E501,E203,W503 .
+    - name: Type check with mypy
+      run: mypy --ignore-missing-imports .
