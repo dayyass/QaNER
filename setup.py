@@ -15,7 +15,7 @@ setup(
     author="Dani El-Ayyass",
     author_email="dayyass@yandex.ru",
     license_files=["LICENSE"],
-    url="https://github.com/dayyass/QaNER",
+    url="https://github.com/dayyass/qaner",
     packages=["qaner"],
     install_requires=[
         "numpy==1.21.6",
