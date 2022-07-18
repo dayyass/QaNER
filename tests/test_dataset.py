@@ -1,5 +1,4 @@
 import json
-import sys
 import unittest
 from typing import List
 
@@ -7,11 +6,9 @@ import torch
 from tqdm import tqdm
 from transformers import AutoTokenizer, BatchEncoding
 
-sys.path.append("qaner")  # TODO: fix it
-
-from data_utils import prepare_sentences_and_spans, read_bio_markup  # noqa: E402
-from dataset import Collator, Dataset, Instance, Span  # noqa: E402
-from utils import set_global_seed  # noqa: E402
+from qaner.data_utils import prepare_sentences_and_spans, read_bio_markup
+from qaner.dataset import Collator, Dataset, Instance, Span
+from qaner.utils import set_global_seed
 
 
 def validate_spans(
