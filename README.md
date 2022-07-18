@@ -1,3 +1,17 @@
+[![tests](https://github.com/dayyass/qaner/actions/workflows/tests.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/tests.yml)
+[![linter](https://github.com/dayyass/qaner/actions/workflows/linter.yml/badge.svg)](https://github.com/dayyass/qaner/actions/workflows/linter.yml)
+[![codecov](https://codecov.io/gh/dayyass/qaner/branch/main/graph/badge.svg?token=S3UKX8BFP3)](https://codecov.io/gh/dayyass/qaner)
+
+[![python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://github.com/dayyass/qaner#requirements)
+[![release (latest by date)](https://img.shields.io/github/v/release/dayyass/qaner)](https://github.com/dayyass/qaner/releases/latest)
+[![license](https://img.shields.io/github/license/dayyass/qaner?color=blue)](https://github.com/dayyass/qaner/blob/main/LICENSE)
+
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-black)](https://github.com/dayyass/qaner/blob/main/.pre-commit-config.yaml)
+[![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+[![pypi version](https://img.shields.io/pypi/v/qaner)](https://pypi.org/project/qaner)
+[![pypi downloads](https://img.shields.io/pypi/dm/qaner)](https://pypi.org/project/qaner)
+
 # QaNER
 Unofficial implementation of [*QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition*](https://arxiv.org/abs/2203.01543).
 
