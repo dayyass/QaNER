@@ -1,7 +1,8 @@
 from typing import Dict, List
 
 import numpy as np
-from data_utils import Span
+
+from qaner.data_utils import Span
 
 
 # TODO: add metrics over label types
@@ -33,7 +34,7 @@ def compute_metrics(
     confusion_matrix_pred_denominator = np.zeros(len(entity_mapper))
 
     for span_true, span_pred in zip(spans_true_batch, spans_pred_batch_top_1):
-        span_pred = span_pred[0]
+        span_pred = span_pred[0]  # type: ignore
 
         i = entity_mapper[span_true.label]
         j = entity_mapper[span_pred.label]  # type: ignore

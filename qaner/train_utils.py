@@ -2,12 +2,13 @@ from collections import defaultdict
 
 import numpy as np
 import torch
-from data_utils import Span
-from inference_utils import get_top_valid_spans
-from metrics import compute_metrics
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from transformers import AutoModelForQuestionAnswering
+
+from qaner.data_utils import Span
+from qaner.inference_utils import get_top_valid_spans
+from qaner.metrics import compute_metrics
 
 
 # TODO: add metrics calculation

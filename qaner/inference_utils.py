@@ -3,7 +3,8 @@ from typing import Dict, List
 import numpy as np
 import torch
 import transformers
-from data_utils import Span
+
+from qaner.data_utils import Span
 
 
 def get_top_valid_spans(

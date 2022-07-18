@@ -1,13 +1,14 @@
 import json
 
 import torch
-from arg_parse import get_train_args
-from data_utils import prepare_sentences_and_spans, read_bio_markup
-from dataset import Collator, Dataset
 from torch.utils.tensorboard import SummaryWriter
-from train_utils import train
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
-from utils import set_global_seed
+
+from qaner.arg_parse import get_train_args
+from qaner.data_utils import prepare_sentences_and_spans, read_bio_markup
+from qaner.dataset import Collator, Dataset
+from qaner.train_utils import train
+from qaner.utils import set_global_seed
 
 if __name__ == "__main__":
 
