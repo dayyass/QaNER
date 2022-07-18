@@ -72,7 +72,13 @@ def predict(
     return prediction
 
 
-if __name__ == "__main__":
+def main() -> int:
+    """
+    Main inference function.
+
+    Returns:
+        int: exit code.
+    """
 
     # argparse
     args = get_inference_args()
@@ -114,3 +120,9 @@ if __name__ == "__main__":
     print(f"\nquestion: {prediction.question}\n")
     print(f"context: {prediction.context}")
     print(f"\nanswer: {prediction.answer}\n")
+
+    return 0
+
+
+if __name__ == "__main__":
+    main()

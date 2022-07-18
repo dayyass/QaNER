@@ -17,6 +17,12 @@ setup(
     license_files=["LICENSE"],
     url="https://github.com/dayyass/qaner",
     packages=["qaner"],
+    entry_points={
+        "console_scripts": [
+            "qaner-train = qaner.train:main",
+            "qaner-inference = qaner.inference:main",
+        ],
+    },
     install_requires=[
         "numpy==1.21.6",
         "tensorboard==2.9.0",

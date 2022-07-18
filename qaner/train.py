@@ -10,7 +10,14 @@ from qaner.dataset import Collator, Dataset
 from qaner.train_utils import train
 from qaner.utils import set_global_seed
 
-if __name__ == "__main__":
+
+def main() -> int:
+    """
+    Main train function.
+
+    Returns:
+        int: exit code.
+    """
 
     # argparse
     args = get_train_args()
@@ -106,3 +113,9 @@ if __name__ == "__main__":
 
     model.save_pretrained(args.path_to_save_model)
     tokenizer.save_pretrained(args.path_to_save_model)
+
+    return 0
+
+
+if __name__ == "__main__":
+    main()
