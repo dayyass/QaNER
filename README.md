@@ -17,6 +17,9 @@ Unofficial implementation of [*QaNER: Prompting Question Answering Models for Fe
 
 You can adopt this pipeline for arbitrary [BIO-markup](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
 
+My public talk about this project at Sberloga:<br>
+[QaNER - NER via Exractive QA](https://youtu.be/JRec8FpjhpM)
+
 ## Installation
 ```
 pip install qaner
