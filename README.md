@@ -12,13 +12,13 @@
 [![pypi version](https://img.shields.io/pypi/v/qaner)](https://pypi.org/project/qaner)
 [![pypi downloads](https://img.shields.io/pypi/dm/qaner)](https://pypi.org/project/qaner)
 
+My public talk about this project at Sberloga:<br>
+[**QaNER - NER via Exractive QA**](https://youtu.be/JRec8FpjhpM)
+
 # QaNER
 Unofficial implementation of [*QaNER: Prompting Question Answering Models for Few-shot Named Entity Recognition*](https://arxiv.org/abs/2203.01543).
 
 You can adopt this pipeline for arbitrary [BIO-markup](https://github.com/dayyass/QaNER/tree/main/data/conll2003) data.
-
-My public talk about this project at Sberloga:<br>
-[QaNER - NER via Exractive QA](https://youtu.be/JRec8FpjhpM)
 
 ## Installation
 ```
